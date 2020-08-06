@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class ImageLoader {
 
@@ -53,6 +52,8 @@ public class ImageLoader {
      */
     List<RequestHandler> requestHandlers;
 
+    final boolean LIFO;
+
     static ImageLoader singleton;
 
 
@@ -72,14 +73,15 @@ public class ImageLoader {
         }
     };
 
-    ImageLoader(Context context, ExecutorService executorService, Downloader downLoader,
-                Cache cache, Dispatcher dispatcher, List<RequestHandler> extraRequestHandler) {
+    ImageLoader(Context context, ExecutorService executorService, Downloader downLoader, Cache cache,
+                Dispatcher dispatcher, List<RequestHandler> extraRequestHandler, boolean LIFO) {
         this.context = context;
         this.executorService = executorService;
         this.downLoader = downLoader;
         this.memoryCache = cache;
         targetToAction = new HashMap<>();
         this.dispatcher = dispatcher;
+        this.LIFO = LIFO;
         // 创建一个临时的列表
         List<RequestHandler> allRequestHandlerList = new ArrayList<>();
         if (extraRequestHandler != null) {
@@ -185,6 +187,7 @@ public class ImageLoader {
         private Downloader downloader;
         private Cache cache;
         private List<RequestHandler> requestHandlerList;
+        private boolean LIFO = false;
 
         public Builder(@NonNull Context context) {
             this.context = context;
@@ -216,6 +219,11 @@ public class ImageLoader {
             return this;
         }
 
+        public Builder setLIFO() {
+            LIFO = true;
+            return this;
+        }
+
         public ImageLoader build() {
             if (this.cache == null) {
                 this.cache = new MemoryCache(context);
@@ -227,12 +235,11 @@ public class ImageLoader {
                 this.downloader = new HttpDownloader(context);
             }
             if (this.executorService == null) {
-                this.executorService = Executors.newCachedThreadPool();
+                this.executorService = new DefaultExecutorService(LIFO);
             }
             Dispatcher dispatcher = new Dispatcher(downloader, executorService, cache, MAIN_HANDLER);
             return new ImageLoader(context, executorService, downloader,
-                    cache, dispatcher, requestHandlerList);
+                    cache, dispatcher, requestHandlerList, LIFO);
         }
-
     }
 }

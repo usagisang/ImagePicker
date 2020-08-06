@@ -33,6 +33,10 @@ class Worker implements Runnable {
     String mKey;
     RequestHandler mRequestHandler;
 
+    /**
+     * Worker任务被创建的时间
+     */
+    final long createTime = System.currentTimeMillis();
 
     Worker(Action action, Cache memoryCache, Dispatcher dispatcher, RequestHandler requestHandler) {
         this.action = action;
@@ -45,6 +49,10 @@ class Worker implements Runnable {
 
     @Override
     public void run() {
+        // 在LIFO模式，检查一遍请求是否已经被取消
+        if (ImageLoader.singleton.LIFO && action.isCancelled()) {
+            return;
+        }
         try {
             result = loadBitmap();
             dispatcher.dispatchComplete(this);
@@ -156,7 +164,6 @@ class Worker implements Runnable {
                 drawX = (originWidth - cropWidth) / 2;
                 drawWidth = cropWidth;
             }
-            // 预缩放
             matrix.preScale(scale, scale);
         } else if (action.centerInside) {
             // 如果是CenterInside模式，只需要最小的比例就行了
