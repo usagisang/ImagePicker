@@ -205,7 +205,7 @@ public class ScalableImageView extends AppCompatImageView {
         float scale = nowDistance / mLastDistance;
         // 重置距离
         mLastDistance = nowDistance;
-        mMatrix.postScale(scale, scale, mImageMidden.x, mImageMidden.y);
+        mMatrix.postScale(scale, scale, mLastMidPoint.x, mLastMidPoint.y);
         mNowScale *= scale;
         Log.d("this", mNowScale + " : " + nowDistance);
     }
@@ -252,7 +252,7 @@ public class ScalableImageView extends AppCompatImageView {
      * 检查图片缩放比例是否超过设置的大小
      */
     private void checkScale() {
-        PointF scaleCenter = mImageMidden;
+        PointF scaleCenter = mLastMidPoint;
         // 缓存校正比例的变量
         float scale = 1f;
         // 根据情况计算校正比例
