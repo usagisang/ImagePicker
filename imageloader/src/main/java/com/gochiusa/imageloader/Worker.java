@@ -32,25 +32,28 @@ class Worker implements Runnable {
     boolean mSkipCache;
     String mKey;
     RequestHandler mRequestHandler;
+    final ImageLoader imageLoader;
 
     /**
      * Worker任务被创建的时间
      */
     final long createTime = System.currentTimeMillis();
 
-    Worker(Action action, Cache memoryCache, Dispatcher dispatcher, RequestHandler requestHandler) {
+    Worker(Action action, Cache memoryCache, Dispatcher dispatcher,
+           RequestHandler requestHandler, ImageLoader loader) {
         this.action = action;
         mMemoryCache = memoryCache;
         this.dispatcher = dispatcher;
         mKey = action.key;
         mSkipCache = action.skipMemoryCache;
         mRequestHandler = requestHandler;
+        imageLoader = loader;
     }
 
     @Override
     public void run() {
         // 在LIFO模式，检查一遍请求是否已经被取消
-        if (ImageLoader.singleton.LIFO && action.isCancelled()) {
+        if (imageLoader.LIFO && action.isCancelled()) {
             return;
         }
         try {
@@ -102,10 +105,12 @@ class Worker implements Runnable {
         for (int i = 0; i < total; i ++) {
             RequestHandler requestHandler = handlerList.get(i);
             if (requestHandler.canHandleRequest(action)) {
-                return new Worker(action, memoryCache, dispatcher, requestHandler);
+                return new Worker(action, memoryCache, dispatcher, requestHandler,
+                        dispatcher.mImageLoader);
             }
         }
-        return new Worker(action, memoryCache, dispatcher, ERROR_HANDLER);
+        return new Worker(action, memoryCache, dispatcher, ERROR_HANDLER,
+                dispatcher.mImageLoader);
     }
 
     String getKey() {

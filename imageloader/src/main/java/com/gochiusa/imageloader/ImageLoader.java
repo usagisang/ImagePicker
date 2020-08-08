@@ -74,19 +74,21 @@ public class ImageLoader {
     };
 
     ImageLoader(Context context, ExecutorService executorService, Downloader downLoader, Cache cache,
-                Dispatcher dispatcher, List<RequestHandler> extraRequestHandler, boolean LIFO) {
+                List<RequestHandler> extraRequestHandler, boolean LIFO) {
         this.context = context;
         this.executorService = executorService;
         this.downLoader = downLoader;
         this.memoryCache = cache;
         targetToAction = new HashMap<>();
-        this.dispatcher = dispatcher;
+        this.dispatcher = new Dispatcher(downLoader, executorService,
+                cache, MAIN_HANDLER, this);
         this.LIFO = LIFO;
         // 创建一个临时的列表
         List<RequestHandler> allRequestHandlerList = new ArrayList<>();
         if (extraRequestHandler != null) {
             allRequestHandlerList.addAll(extraRequestHandler);
         }
+        allRequestHandlerList.add(new ContentStreamRequestHandler(context));
         allRequestHandlerList.add(new NetworkRequestHandler(downLoader));
         // 创建不可变的列表
         requestHandlers = Collections.unmodifiableList(allRequestHandlerList);
@@ -237,9 +239,8 @@ public class ImageLoader {
             if (this.executorService == null) {
                 this.executorService = new DefaultExecutorService(LIFO);
             }
-            Dispatcher dispatcher = new Dispatcher(downloader, executorService, cache, MAIN_HANDLER);
             return new ImageLoader(context, executorService, downloader,
-                    cache, dispatcher, requestHandlerList, LIFO);
+                    cache, requestHandlerList, LIFO);
         }
     }
 }

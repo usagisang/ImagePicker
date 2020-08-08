@@ -40,6 +40,7 @@ class Dispatcher {
     private Downloader mDownloader;
     private ExecutorService mExecutorService;
     private Handler mMainHandler;
+    ImageLoader mImageLoader;
     /**
      *  分发处理线程
      */
@@ -54,12 +55,13 @@ class Dispatcher {
 
 
     Dispatcher(Downloader downloader, ExecutorService executorService,
-               Cache memoryCache, Handler mainHandler) {
+               Cache memoryCache, Handler mainHandler, ImageLoader loader) {
         mWorkerMap = new HashMap<>();
         this.mDownloader = downloader;
         this.mExecutorService = executorService;
         mMainHandler = mainHandler;
         mDispatchThread = new DispatchThread();
+        mImageLoader = loader;
         // 让线程开始工作
         mDispatchThread.start();
         mMemoryCache = memoryCache;
