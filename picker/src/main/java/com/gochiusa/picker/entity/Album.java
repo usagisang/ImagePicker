@@ -3,7 +3,11 @@ package com.gochiusa.picker.entity;
 import android.database.Cursor;
 import android.provider.MediaStore;
 
+import androidx.annotation.Nullable;
+
 import com.gochiusa.picker.model.AlbumContract;
+
+import java.util.List;
 
 public class Album {
 
@@ -18,6 +22,11 @@ public class Album {
     private String coverPath;
     private String displayName;
     private int count;
+
+    /**
+     *  这个相册包含的图片
+     */
+    private List<Image> imageOfAlbum;
 
     public Album(String id, String coverPath, String displayName, int count) {
         this.id = id;
@@ -39,6 +48,15 @@ public class Album {
 
     public String getId() {
         return id;
+    }
+
+    @Nullable
+    public List<Image> getImageOfAlbum() {
+        return imageOfAlbum;
+    }
+
+    public void setImageOfAlbum(List<Image> imageOfAlbum) {
+        this.imageOfAlbum = imageOfAlbum;
     }
 
     /**
