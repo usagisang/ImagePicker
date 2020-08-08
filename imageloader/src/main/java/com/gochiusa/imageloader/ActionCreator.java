@@ -30,7 +30,12 @@ public class ActionCreator {
      */
     private int mPlaceHolderId;
 
-    private boolean mSkipMemoryCache;
+    boolean mSkipMemoryCache;
+
+    /**
+     *  跳过所有缓存
+     */
+    boolean mSkipAllCache;
 
     /**
      *  图片的目标宽高
@@ -41,7 +46,7 @@ public class ActionCreator {
     /**
      *  加载错误后显示的图片的资源id
      */
-    private int mErrorResId;
+    int mErrorResId;
 
     /**
      *  策略：完全缩放图片直到长宽都能放进ImageView
@@ -63,7 +68,8 @@ public class ActionCreator {
         if (setPlaceHolder) {
             target.setImageDrawable(getPlaceHolder());
         }
-        if (! mSkipMemoryCache) {
+        // 如果不跳过缓存
+        if (!(mSkipAllCache || mSkipMemoryCache)) {
             // 从内存缓存中尝试检索位图
             Bitmap cacheBitmap = mImageLoader.quickMemoryCacheCheck(mKey);
             if (cacheBitmap != null) {
@@ -87,8 +93,7 @@ public class ActionCreator {
                 resize(width, height);
             }
         }
-        Action action = new Action(mImageLoader, mErrorResId, target, mKey, mUri,
-                mSkipMemoryCache, this);
+        Action action = new Action(mImageLoader, target, mKey, mUri, this);
         // 提交请求
         mImageLoader.enqueueAndSubmit(action);
     }
@@ -127,9 +132,18 @@ public class ActionCreator {
     }
 
     /**
-     *  忽略缓存，若忽略加载结果则不会进入缓存，也不会尝试从缓存读取数据
+     *  忽略内存缓存，若忽略，加载结果则不会进入内存缓存，也不会尝试从内存缓存读取数据
      */
     public ActionCreator skipMemoryCache() {
+        mSkipMemoryCache = true;
+        return this;
+    }
+
+    /**
+     *  忽略所有缓存，若忽略，加载结果则不会进入任何缓存，也不会尝试从缓存读取数据
+     */
+    public ActionCreator skipAllCache() {
+        mSkipAllCache = true;
         mSkipMemoryCache = true;
         return this;
     }

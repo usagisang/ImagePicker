@@ -19,7 +19,7 @@ class Worker implements Runnable {
             return true;
         }
         @Override
-        public Bitmap load(Action data) throws IOException {
+        public Bitmap load(Action data) {
             throw new IllegalStateException("未知类型的请求：" + data.getUri());
         }
     };
@@ -45,7 +45,7 @@ class Worker implements Runnable {
         mMemoryCache = memoryCache;
         this.dispatcher = dispatcher;
         mKey = action.key;
-        mSkipCache = action.skipMemoryCache;
+        mSkipCache = action.skipMemoryCache || action.skipAllCache;
         mRequestHandler = requestHandler;
         imageLoader = loader;
     }

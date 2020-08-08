@@ -17,8 +17,15 @@ import static android.content.ContentResolver.SCHEME_FILE;
 public class ContentStreamRequestHandler extends RequestHandler {
 
     private Context context;
+    /**
+     *  内存缓存
+     */
+    private DiskCache mDiskCache;
     public ContentStreamRequestHandler(Context context) {
         this.context = context;
+        try {
+            mDiskCache = new DiskCache(context);
+        } catch (IOException ignore) {}
     }
     @Override
     public boolean canHandleRequest(Action data) {
@@ -28,6 +35,12 @@ public class ContentStreamRequestHandler extends RequestHandler {
 
     @Override
     public Bitmap load(Action data) throws IOException {
+        // 如果允许使用缓存，优先读取缓存
+        if (! data.skipAllCache) {
+            if (mDiskCache != null && mDiskCache.get(data.key) != null) {
+                return mDiskCache.get(data.key);
+            }
+        }
         ContentResolver contentResolver = context.getContentResolver();
         final BitmapFactory.Options options = createBitmapOptions(data);
         // 如果需要计算尺寸

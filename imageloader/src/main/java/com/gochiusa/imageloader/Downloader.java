@@ -13,11 +13,12 @@ public interface Downloader {
     /**
      * 从internet下载指定的图像{@code url}
      * @param imageUrl 远程图像URL
+     * @param skipCache 是否跳过缓存，传入{@code true}以跳过
      * @return {@link Response} 包含了 {@link Bitmap} 响应或者一个{@link InputStream}
      * 的输入流来表示图像数据 ，返回{@code null}以指示加载位图时出现问题
      * @throws IOException 如果请求的URL无法成功加载，将引发IOException
      */
-    Response load(String imageUrl) throws IOException;
+    Response load(String imageUrl, boolean skipCache) throws IOException;
 
     /**
      *  清除、关闭磁盘缓存

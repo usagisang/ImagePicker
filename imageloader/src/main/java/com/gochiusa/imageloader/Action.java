@@ -16,6 +16,7 @@ class Action {
     final Uri uri;
     final String key;
     final boolean skipMemoryCache;
+    final boolean skipAllCache;
     final int targetWidth;
     final int targetHeight;
     final boolean centerInside;
@@ -26,14 +27,15 @@ class Action {
      */
     boolean cancelled;
 
-    Action(ImageLoader imageLoader, int errorDrawableId, ImageView target, String key, Uri uri,
-           boolean skipMemoryCache, ActionCreator actionCreator) {
+    Action(ImageLoader imageLoader, ImageView target, String key, Uri uri,
+           ActionCreator actionCreator) {
         this.imageLoader = imageLoader;
         this.target = new WeakReference<>(target);
-        this.errorDrawableId = errorDrawableId;
+        this.errorDrawableId = actionCreator.mErrorResId;
         this.key = key;
         this.uri = uri;
-        this.skipMemoryCache = skipMemoryCache;
+        this.skipMemoryCache = actionCreator.mSkipMemoryCache;
+        this.skipAllCache = actionCreator.mSkipAllCache;
         this.targetWidth = actionCreator.targetWidth;
         this.targetHeight = actionCreator.targetHeight;
         this.centerCrop = actionCreator.mCenterCrop;

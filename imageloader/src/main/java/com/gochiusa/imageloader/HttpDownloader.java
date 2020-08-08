@@ -28,9 +28,9 @@ public class HttpDownloader implements Downloader {
     }
 
     @Override
-    public Response load(String imageUrl) throws IOException {
-        if (mDiskCache != null && mDiskCache.get(imageUrl) != null) {
-            // 如果缓存命中，则直接返回Response
+    public Response load(String imageUrl, boolean skipCache) throws IOException {
+        if ((!skipCache) && (mDiskCache != null) && (mDiskCache.get(imageUrl) != null)) {
+            // 如果允许读取缓存，而且缓存命中，则直接返回Response
             return new Response(mDiskCache.get(imageUrl), true);
         }
         // 直接使用默认方法创建Call

@@ -24,7 +24,8 @@ class NetworkRequestHandler extends RequestHandler {
 
     @Override
     public Bitmap load(Action data) throws IOException {
-        Downloader.Response response = mDownloader.load(data.key);
+        boolean skipCache = data.skipAllCache || data.skipMemoryCache;
+        Downloader.Response response = mDownloader.load(data.key, skipCache);
         Bitmap bitmap = response.getBitmap();
         if (bitmap != null) {
             return bitmap;
@@ -35,7 +36,6 @@ class NetworkRequestHandler extends RequestHandler {
         } else {
             return decodeInputStream(inputStream, data);
         }
-
     }
 
     private Bitmap decodeInputStream(InputStream inputStream, Action action) throws IOException {
