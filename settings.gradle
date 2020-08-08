@@ -1,3 +1,5 @@
+include ':imageloader'
+include ':http'
 include ':picker'
 include ':app'
 rootProject.name = "ImagePicker"

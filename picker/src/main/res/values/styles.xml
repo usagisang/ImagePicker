@@ -4,6 +4,7 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/color_picker_primary</item>
         <item name="colorPrimaryDark">@color/color_picker_primary_dark</item>
+        <item name="navigationIcon">@drawable/ic_ui_close</item>
     </style>
 
 </resources>

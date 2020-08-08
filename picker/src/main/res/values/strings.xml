@@ -1,3 +1,5 @@
 <resources>
-
+    <string name="picker_ok">确认</string>
+    <string name="picker_ok_with_count">确认(%1$d/%2$d)</string>
+    <string name="select_document">选择文件夹</string>
 </resources>
