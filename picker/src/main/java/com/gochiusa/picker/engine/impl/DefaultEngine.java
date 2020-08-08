@@ -36,7 +36,18 @@ public class DefaultEngine implements ImageEngine {
 
     @Override
     public void loadImage(Context context, int resizeX, int resizeY, ImageView imageView, Uri uri) {
+        if (loader == null) {
+            createLoader(context);
+        }
+        loader.load(uri).resize(resizeX, resizeY).skipAllCache().into(imageView);
+    }
 
+    @Override
+    public void loadImage(Context context, ImageView imageView, Uri uri) {
+        if (loader == null) {
+            createLoader(context);
+        }
+        loader.load(uri).skipAllCache().into(imageView);
     }
 
     private void createLoader(Context context) {

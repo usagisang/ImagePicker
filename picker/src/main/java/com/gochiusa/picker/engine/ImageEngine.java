@@ -11,5 +11,5 @@ public interface ImageEngine {
                        Drawable placeholder, ImageView imageView, Uri uri);
     void loadImage(Context context, int resizeX,
                    int resizeY, ImageView imageView, Uri uri);
-
+    void loadImage(Context context, ImageView imageView, Uri uri);
 }
