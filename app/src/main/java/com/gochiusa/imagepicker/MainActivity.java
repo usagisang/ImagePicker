@@ -37,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this,
                         new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST);
             } else {
-                ImagePicker.from(this).choose().forResult(RESULT_REQUEST);
+                ImagePicker.from(this).choose(true).setMaxCount(9)
+                        .setLIFO(true).forResult(RESULT_REQUEST);
             }
         });
     }
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
                                            @NonNull int[] grantResults) {
         if (requestCode == PERMISSION_REQUEST) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                ImagePicker.from(this).choose().forResult(RESULT_REQUEST);
+                ImagePicker.from(this).choose(false).forResult(RESULT_REQUEST);
             } else {
                 Toast.makeText(this, mRefuseTip, Toast.LENGTH_SHORT).show();
             }
