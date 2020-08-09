@@ -5,7 +5,6 @@ import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import androidx.appcompat.widget.AppCompatImageView;
@@ -31,7 +30,7 @@ public class ScalableImageView extends AppCompatImageView {
      *  允许的最小缩放倍数，由于图片不同，比例也有差异，故进行动态计算
      *  选取能够恰好完全显示在控件内的比例作为最小比例
      */
-    private static float sMinScale;
+    private float mMinScale;
     /**
      *  上一次触控事件的的所有点的中点
      */
@@ -75,27 +74,32 @@ public class ScalableImageView extends AppCompatImageView {
     }
 
     @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
-        initImgPositionAndSize();
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        initImagePositionAndSize();
     }
 
     /**
      * 初始化图片位置和大小
      */
-    private void initImgPositionAndSize() {
+    private void initImagePositionAndSize() {
         mMatrix.reset();
         // 初始化ImageRect
         refreshImageRect();
+        // 判断能否进行计算，如果满足下列条件，是无法计算缩放的结果的
+        boolean notCalculate = (getMeasuredWidth() == 0) || (getMeasuredHeight() == 0) ||
+                (mImageRect.height() == 0) || (mImageRect.width() == 0);
+        if (notCalculate) {
+            return;
+        }
         // 设置几何中心
         mImageMidden.set(mImageRect.centerX(), mImageRect.centerY());
         // 计算一个比较合适的缩放比例，对图片进行初始化缩放
-        sMinScale = Math.min(getWidth() / mImageRect.width(),
-                getHeight() / mImageRect.height());
-
-        mNowScale = sMinScale;
+        mMinScale = Math.min(getMeasuredWidth() / mImageRect.width(),
+                getMeasuredHeight() / mImageRect.height());
+        mNowScale = mMinScale;
         // 缩放
-        mMatrix.postScale(sMinScale, sMinScale, mImageRect.centerX(), mImageRect.centerY());
+        mMatrix.postScale(mMinScale, mMinScale, mImageRect.centerX(), mImageRect.centerY());
         // 刷新缩放后的矩形
         refreshImageRect();
         // 移动图片到中心
@@ -207,7 +211,6 @@ public class ScalableImageView extends AppCompatImageView {
         mLastDistance = nowDistance;
         mMatrix.postScale(scale, scale, mLastMidPoint.x, mLastMidPoint.y);
         mNowScale *= scale;
-        Log.d("this", mNowScale + " : " + nowDistance);
     }
 
     /**
@@ -258,8 +261,8 @@ public class ScalableImageView extends AppCompatImageView {
         // 根据情况计算校正比例
         if (mNowScale > MAX_SCALE) {
             scale = MAX_SCALE / mNowScale;
-        } else if (mNowScale < sMinScale) {
-            scale = sMinScale / mNowScale;
+        } else if (mNowScale < mMinScale) {
+            scale = mMinScale / mNowScale;
         }
         // 设置缩放
         mMatrix.postScale(scale, scale, scaleCenter.x, scaleCenter.y);
