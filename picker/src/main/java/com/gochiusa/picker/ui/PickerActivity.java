@@ -91,7 +91,7 @@ public class PickerActivity extends AppCompatActivity implements Observer {
             } else {
                 // 设置选择的结果
                 Intent intent = new Intent();
-                intent.putExtra(SELECTION_KEY, mItemCollection.toArray());
+                intent.putExtra(SELECTION_KEY, mItemCollection.getUriArray());
                 // 返回结果
                 setResult(Activity.RESULT_OK, intent);
                 clear();

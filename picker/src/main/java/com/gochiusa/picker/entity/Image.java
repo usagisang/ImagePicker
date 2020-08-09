@@ -4,10 +4,9 @@ import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Parcel;
-import android.os.Parcelable;
 import android.provider.MediaStore;
 
-public class Image implements Parcelable {
+public class Image {
     private long id;
     private String mimeType;
     private Uri uri;
@@ -28,18 +27,6 @@ public class Image implements Parcelable {
         uri = in.readParcelable(Uri.class.getClassLoader());
         size = in.readLong();
     }
-
-    public static final Creator<Image> CREATOR = new Creator<Image>() {
-        @Override
-        public Image createFromParcel(Parcel in) {
-            return new Image(in);
-        }
-
-        @Override
-        public Image[] newArray(int size) {
-            return new Image[size];
-        }
-    };
 
     public long getId() {
         return id;
@@ -79,18 +66,5 @@ public class Image implements Parcelable {
         return new Image(cursor.getLong(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID)),
                 cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.MIME_TYPE)),
                 cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE)));
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(id);
-        dest.writeString(mimeType);
-        dest.writeParcelable(uri, 0);
-        dest.writeLong(size);
     }
 }

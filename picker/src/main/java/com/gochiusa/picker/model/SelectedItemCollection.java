@@ -1,5 +1,7 @@
 package com.gochiusa.picker.model;
 
+import android.net.Uri;
+
 import com.gochiusa.imageloader.ImageLoader;
 import com.gochiusa.picker.entity.Image;
 
@@ -52,10 +54,15 @@ public class SelectedItemCollection extends Observable {
     }
 
     /**
-     *  将当前所有已选项目，封装在数组内返回
+     *  将当前所有已选项目的Uri，封装在数组内返回
      */
-    public Image[] toArray() {
-        return mImageList.toArray(new Image[0]);
+    public Uri[] getUriArray() {
+        int size = getSize();
+        Uri[] result = new Uri[size];
+        for (int i = 0; i < size; i ++) {
+            result[i] = mImageList.get(i).getUri();
+        }
+        return result;
     }
 
     public int itemIndexOf(Image image) {
