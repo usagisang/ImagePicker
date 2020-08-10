@@ -29,6 +29,7 @@ public class ImageWallFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private List<Image> mImageList;
+    private GridLayoutManager mGridLayoutManager;
 
     public ImageWallFragment() {}
 
@@ -47,13 +48,13 @@ public class ImageWallFragment extends Fragment {
 
     private void initRecyclerView(View parent) {
         mRecyclerView = parent.findViewById(R.id.rv_ui_photo_wall);
+        mGridLayoutManager = new GridLayoutManager(getContext(), 3);
         // 设置为网格布局
-        mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        mRecyclerView.setLayoutManager(mGridLayoutManager);
         // 添加自定义分割线
         mRecyclerView.addItemDecoration(new WallDecoration());
         // 初始化适配器
-        ImageAdapter mImageAdapter = new ImageAdapter(mImageList);
-        mRecyclerView.setAdapter(mImageAdapter);
+        mRecyclerView.setAdapter(new ImageAdapter(mImageList));
     }
 
     /**
@@ -61,7 +62,7 @@ public class ImageWallFragment extends Fragment {
      */
     @Nullable
     public ItemImageWall getWallItemAt(int position) {
-        View view = mRecyclerView.getChildAt(position);
+        View view = mGridLayoutManager.findViewByPosition(position);
         if (view instanceof ItemImageWall) {
             return (ItemImageWall) view;
         } else {
