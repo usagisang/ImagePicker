@@ -32,12 +32,12 @@ public class CheckView extends View {
     /**
      *  Checkbox的圆的半径
      */
-    private static final float FRAME_RADIUS = 11.5f;
+    private static final float FRAME_RADIUS = 10.0f;
 
     /**
      *  CheckBox的背景的半径
      */
-    private static final float BG_RADIUS = 11.0f;
+    private static final float BG_RADIUS = 9.5f;
 
     /**
      *  密度比例因子
@@ -52,7 +52,7 @@ public class CheckView extends View {
     /**
      *  是否选中
      */
-    private boolean mSelected;
+    private boolean mChecked;
     /**
      *  显示的选择数字
      */
@@ -88,7 +88,7 @@ public class CheckView extends View {
             throw new IllegalArgumentException("传入的数字必须为正或者为预设的UNSELECTED");
         }
         // 设置状态，如果是设置了未选中
-        mSelected = (number != UNSELECTED);
+        mChecked = (number != UNSELECTED);
         // 设置数字
         mCheckNum = number;
         // 刷新界面
@@ -99,9 +99,16 @@ public class CheckView extends View {
      *  设置这个view是否为选中状态，并刷新View。
      *  单选应当使用这个API来显示选择、取消选择的视觉效果
      */
-    public void setSelected(boolean selected) {
-        mSelected = selected;
+    public void setChecked(boolean checked) {
+        mChecked = checked;
         invalidate();
+    }
+
+    /**
+     *  检查控件是否处于选中状态，这包含了单选选中和多选选中的情况
+     */
+    public boolean isChecked() {
+        return mChecked;
     }
 
     /**
@@ -130,7 +137,7 @@ public class CheckView extends View {
         mFramePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         // 设置为白色边框
         mFramePaint.setColor(ResourcesCompat.getColor(getResources(),
-                R.color.color_white, getContext().getTheme()));
+                R.color.color_check_view_circle, getContext().getTheme()));
         // 设置为画线模式
         mFramePaint.setStyle(Paint.Style.STROKE);
         // 设置线的宽度
@@ -148,7 +155,7 @@ public class CheckView extends View {
         float center = (float) VIEW_SIZE * mDensity / 2;
         // 绘制边框圆形
         canvas.drawCircle(center, center, FRAME_RADIUS * mDensity, mFramePaint);
-        if (mSelected) {
+        if (mChecked) {
             // 绘制背景
             initBackgroundPaint();
             canvas.drawCircle(center, center, BG_RADIUS * mDensity, mBackgroundPaint);

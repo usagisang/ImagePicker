@@ -28,8 +28,8 @@ public final class ImagePicker {
         return new ImagePicker(fragment.getActivity(), fragment);
     }
 
-    public ImageRequestCreator choose() {
-        return new ImageRequestCreator(this);
+    public ImageRequestCreator choose(boolean countable) {
+        return new ImageRequestCreator(this, countable);
     }
 
     @Nullable

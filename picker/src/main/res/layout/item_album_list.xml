@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="?attr/selectableItemBackground"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:src="@drawable/ic_photo_album"
+        android:id="@+id/iv_ui_album_cover"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/tv_ui_album_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/iv_ui_album_cover"
+        android:ellipsize="end"
+        android:layout_margin="8dp"
+        android:maxLines="1"
+        android:textColor="@color/color_black"
+        android:textSize="20sp"
+        tools:text="全部图片" />
+
+    <TextView
+        android:id="@+id/tv_ui_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/iv_ui_album_cover"
+        android:layout_below="@+id/tv_ui_album_name"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="4dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textSize="16sp"
+        tools:text="1000张" />
+
+    <ImageView
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_ui_forward" />
+</RelativeLayout>

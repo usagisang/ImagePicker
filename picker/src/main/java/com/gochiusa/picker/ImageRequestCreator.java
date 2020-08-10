@@ -6,6 +6,7 @@ import android.content.Intent;
 
 import androidx.annotation.StyleRes;
 
+import com.gochiusa.picker.engine.ImageEngine;
 import com.gochiusa.picker.entity.ImageRequest;
 import com.gochiusa.picker.ui.PickerActivity;
 
@@ -14,9 +15,10 @@ public final class ImageRequestCreator {
     private ImageRequest mImageRequest;
 
 
-    ImageRequestCreator(ImagePicker imagePicker) {
+    ImageRequestCreator(ImagePicker imagePicker, boolean countable) {
         mImagePicker = imagePicker;
         mImageRequest = ImageRequest.getCleanInstance();
+        mImageRequest.countable = countable;
     }
 
 
@@ -27,6 +29,21 @@ public final class ImageRequestCreator {
 
     public ImageRequestCreator setThemeId(@StyleRes int themeId) {
         mImageRequest.themeId = themeId;
+        return this;
+    }
+
+    public ImageRequestCreator setLIFO(boolean isLIFO) {
+        mImageRequest.setLIFO(isLIFO);
+        return this;
+    }
+
+    public ImageRequestCreator setImageEngine(ImageEngine imageEngine) {
+        mImageRequest.setImageEngine(imageEngine);
+        return this;
+    }
+
+    public ImageRequestCreator setMaxCount(int maxCount) {
+        mImageRequest.maxSelectable = maxCount;
         return this;
     }
 

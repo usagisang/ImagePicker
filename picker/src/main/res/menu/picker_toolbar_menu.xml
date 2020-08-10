@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:enabled="true"
+        app:showAsAction="ifRoom"
+        android:id="@+id/menu_picker_toolbar_confirm"
+        android:title="@string/picker_ok"
+        app:actionViewClass="android.widget.Button" />
+</menu>

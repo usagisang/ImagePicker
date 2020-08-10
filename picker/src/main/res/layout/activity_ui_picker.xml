@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.PickerActivity"
-    android:orientation="vertical">
+    tools:context=".ui.PickerActivity">
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@+id/tb_picker"
         app:titleTextColor="@color/color_white"
         android:layout_width="match_parent"
         android:background="@color/color_picker_primary"
         android:layout_height="?attr/actionBarSize" />
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_ui_photo_wall"
+    <FrameLayout
+        android:layout_below="@+id/tb_picker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scrollbars="vertical" />
-</LinearLayout>
+        android:id="@+id/fl_ui_container"/>
+</RelativeLayout>
