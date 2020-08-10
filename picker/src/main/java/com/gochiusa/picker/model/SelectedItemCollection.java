@@ -2,6 +2,8 @@ package com.gochiusa.picker.model;
 
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
+
 import com.gochiusa.imageloader.ImageLoader;
 import com.gochiusa.picker.entity.Image;
 
@@ -31,7 +33,7 @@ public class SelectedItemCollection extends Observable {
     /**
      *  选择了一个图片后，添加实体类信息与对应的观察者，观察选择的变化
      */
-    public void addSelectedItem(Image image, Observer observer) {
+    public void addSelectedItem(Image image, @NonNull Observer observer) {
         addObserver(observer);
         addSelectedImage(image);
     }
@@ -40,6 +42,20 @@ public class SelectedItemCollection extends Observable {
         mImageList.remove(image);
         // 通知观察者，某一个选择项已经被移除
         notifyAllObserver();
+    }
+
+    /**
+     *  从集合中移除图片，并尝试通知一个观察者，数据已经被更新。
+     * @param image 需要移除的图片
+     * @param observer 需要通知的观察者。
+     */
+    public void removeImageAndNotify(Image image, @NonNull Observer observer) {
+        // 为了避免这个观察者已经注册，导致重复通知的问题，先添加
+        addObserver(observer);
+        // 删除图片，这会通知所有已注册的观察者
+        removeImage(image);
+        // 再注销掉这个观察者
+        deleteObserver(observer);
     }
 
     public void removeAllImage() {
@@ -63,6 +79,10 @@ public class SelectedItemCollection extends Observable {
             result[i] = mImageList.get(i).getUri();
         }
         return result;
+    }
+
+    public Image[] getImageArray() {
+        return mImageList.toArray(new Image[0]);
     }
 
     public int itemIndexOf(Image image) {

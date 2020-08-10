@@ -133,7 +133,7 @@ public class ItemImageWall extends SquareFrameLayout implements Observer, View.O
      *  若持有的image仍然存在于集合内，那么重新注册这个观察者
      *  最后刷新控件状态
      */
-    private void registerObserverAgain() {
+    public void registerObserverAgain() {
         // 获取索引
         int index = mSelectedItemCollection.itemIndexOf(mImage);
         // 判断集合内的参数是否有异常
@@ -141,6 +141,7 @@ public class ItemImageWall extends SquareFrameLayout implements Observer, View.O
                 (mSelectedItemCollection.getSize() - mSelectedItemCollection.countObservers() > -1);
         // 如果索引有效，而且发现观察者被异常移除
         if (index != -1 && addToCollection) {
+            // 尝试添加观察者，因为Observable类已经拦截了相同的观察者，所以不会发生重复注册问题
             mSelectedItemCollection.addObserver(this);
         }
         // 刷新控件状态

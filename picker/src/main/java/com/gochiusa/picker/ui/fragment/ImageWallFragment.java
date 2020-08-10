@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.gochiusa.picker.R;
 import com.gochiusa.picker.adapter.ImageAdapter;
 import com.gochiusa.picker.entity.Image;
+import com.gochiusa.picker.ui.widget.ItemImageWall;
 import com.gochiusa.picker.ui.widget.WallDecoration;
 
 import java.util.List;
@@ -50,6 +51,22 @@ public class ImageWallFragment extends Fragment {
         mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         // 添加自定义分割线
         mRecyclerView.addItemDecoration(new WallDecoration());
-        mRecyclerView.setAdapter(new ImageAdapter(mImageList));
+        // 初始化适配器
+        ImageAdapter mImageAdapter = new ImageAdapter(mImageList);
+        mRecyclerView.setAdapter(mImageAdapter);
     }
+
+    /**
+     *  获取指定位置的照片墙View子项
+     */
+    @Nullable
+    public ItemImageWall getWallItemAt(int position) {
+        View view = mRecyclerView.getChildAt(position);
+        if (view instanceof ItemImageWall) {
+            return (ItemImageWall) view;
+        } else {
+            return null;
+        }
+    }
+
 }

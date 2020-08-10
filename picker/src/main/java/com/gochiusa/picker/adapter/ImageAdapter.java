@@ -24,7 +24,7 @@ import java.util.Locale;
 public class ImageAdapter extends ListAdapter<Image, ImageAdapter.ImageViewHolder>
         implements ItemImageWall.OnWallClickListener {
 
-    private static final String FORMAT_OUT_OF_MAX_TIP = "最多只能选择%d张图片";
+    public static final String FORMAT_OUT_OF_MAX_TIP = "最多只能选择%d张图片";
 
     public ImageAdapter(List<Image> list) {
         super(list);
@@ -72,8 +72,8 @@ public class ImageAdapter extends ListAdapter<Image, ImageAdapter.ImageViewHolde
         ImageRequest imageRequest = ImageRequest.getInstance();
         // 如果已经被选中，取消选择
         if (itemImageWall.getCheckView().isChecked()) {
-            // 从选择的集合中移除这个Image
-            collection.removeImage(image);
+            // 从选择的集合中移除这个Image，并进行通知
+            collection.removeImageAndNotify(image, itemImageWall);
         } else {
             // 未被选中，先检查最大可选数目
             // 如果为1，那么就是切换图片操作，先移除所有项目，以免触发提醒
