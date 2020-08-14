@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.provider.MediaStore;
 
+import androidx.annotation.Nullable;
+
 public class Image {
     private long id;
     private String mimeType;
@@ -66,5 +68,16 @@ public class Image {
         return new Image(cursor.getLong(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID)),
                 cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.MIME_TYPE)),
                 cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE)));
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj instanceof Image) {
+            Image otherImage = (Image) obj;
+            return otherImage.uri.equals(this.uri) && otherImage.id == this.id &&
+                    otherImage.mimeType.equals(this.mimeType) && otherImage.size == this.size;
+        } else {
+            return false;
+        }
     }
 }
