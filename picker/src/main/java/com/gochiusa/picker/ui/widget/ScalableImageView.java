@@ -171,15 +171,26 @@ public class ScalableImageView extends AppCompatImageView {
             case MotionEvent.ACTION_POINTER_DOWN : {
                 // 计算本次触控事件的中点
                 calculateMidPointOfFinger(event);
+               // Log.d("this", event.getPointerCount() + "");
                 // 重置变量
                 mCanDrag = false;
                 mScalable = false;
-                if (event.getPointerCount() == 2) {
+                if (event.getPointerCount() > 1) {
                     // 计算手指距离
                     mLastDistance = calculateDistance(event);
                     mScalable = true;
                 } else if (event.getPointerCount() == 1) {
                     mCanDrag = true;
+                }
+                break;
+            }
+            case MotionEvent.ACTION_POINTER_UP: {
+                // 如果两指抬起变单指，则说明不再进行缩放操作
+                if (event.getPointerCount() == 2) {
+                    mScalable = false;
+                } else {
+                    // 如果仍有多指，为了避免手指抬起时导致图片被缩放，重新计算距离
+                    refreshLastDistance(event);
                 }
                 break;
             }
@@ -229,14 +240,30 @@ public class ScalableImageView extends AppCompatImageView {
 
     /**
      *  在两点触控的情况下调用，计算两点之间的距离，多点的情况只取前两点，一点则返会0
+     * @param event 点击事件，包含手指的位置信息
      * @return 计算出来的两点距离
      */
     private float calculateDistance(MotionEvent event) {
         if (event.getPointerCount() < 2) {
             return 0f;
         }
-        float dx = event.getX(1) - event.getX(0);
-        float dy = event.getY(1) - event.getY(0);
+        return calculateDistance(event, 0, 1);
+    }
+
+    /**
+     *  计算指定的两个手指之间的距离。
+     * @param event 点击事件，包含手指的位置信息
+     * @param firstIndex 第一个手指的索引
+     * @param lastIndex 第二个手指的索引
+     * @return 计算出来的两点距离，如果某一个index的手指不存在，返回0f
+     */
+    private float calculateDistance(MotionEvent event, int firstIndex, int lastIndex) {
+        int maxIndex = event.getPointerCount() - 1;
+        if (firstIndex > maxIndex || lastIndex > maxIndex) {
+            return 0f;
+        }
+        float dx = event.getX(firstIndex) - event.getX(lastIndex);
+        float dy = event.getY(firstIndex) - event.getY(lastIndex);
         // 勾股定理
         return (float) Math.sqrt(dx * dx + dy * dy);
     }
@@ -392,6 +419,26 @@ public class ScalableImageView extends AppCompatImageView {
         if (getDrawable() != null) {
             mImageRect.set(getDrawable().getBounds());
             mMatrix.mapRect(mImageRect, mImageRect);
+        }
+    }
+
+    /**
+     *  辅助方法，有手指被抬起后，重新计算缓存的手指距离
+     * */
+    private void refreshLastDistance(MotionEvent event) {
+        // 根据抬起手指的索引不同，使用不同的策略重置距离
+        switch (event.getActionIndex()) {
+            case 0 : {
+                mLastDistance = calculateDistance(event, 1, 2);
+                break;
+            }
+            case 1 : {
+                mLastDistance = calculateDistance(event, 0, 2);
+                break;
+            }
+            default: {
+                mLastDistance = calculateDistance(event);
+            }
         }
     }
 
