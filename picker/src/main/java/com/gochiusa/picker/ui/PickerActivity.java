@@ -132,11 +132,6 @@ public class PickerActivity extends AppCompatActivity implements Observer {
         super.onBackPressed();
     }
 
-    @Override
-    protected void onDestroy() {
-        clear();
-        super.onDestroy();
-    }
 
     /**
      *  侦听选择的集合中每一次的增加和删除，并及时更新按钮的文字
