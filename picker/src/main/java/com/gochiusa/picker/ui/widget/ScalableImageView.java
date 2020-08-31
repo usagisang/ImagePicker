@@ -69,7 +69,20 @@ public class ScalableImageView extends AppCompatImageView {
      */
     private GestureDetector mGestureDetector;
 
+    /**
+     *  惯性滑动动画
+     */
     private FlingAnimator mFlingAnimator;
+
+    /**
+     *  缩放动画
+     */
+    private ScaleAnimator mScaleAnimator;
+
+    /**
+     *  平移动画
+     */
+    private TranslateAnimator mTranslateAnimator;
 
     public ScalableImageView(Context context) {
         super(context);
@@ -147,8 +160,8 @@ public class ScalableImageView extends AppCompatImageView {
                                    float velocityX, float velocityY) {
                 // 只允许单手指拖动
                 if (mCanDrag) {
-                    // 取消正在进行的所有动画
-                    cancelAllAnimator();
+                    // 取消正在进行的滑动动画
+                    mFlingAnimator.cancel();
                     // 创建新的滑动动画
                     mFlingAnimator = new FlingAnimator(velocityX / 60,
                             velocityY / 60);
@@ -213,7 +226,6 @@ public class ScalableImageView extends AppCompatImageView {
                 // 检查是否越界
                 checkScale();
                 checkBorder();
-                commitMatrix();
                 break;
             }
         }
@@ -340,6 +352,10 @@ public class ScalableImageView extends AppCompatImageView {
         float nowDistance = calculateDistance(event);
         // 计算缩放倍数
         float scale = nowDistance / mLastDistance;
+        // 不允许过小的缩放比例
+        if (mNowScale * scale < mMinScale) {
+            return;
+        }
         // 重置距离
         mLastDistance = nowDistance;
         mMatrix.postScale(scale, scale, mLastMidPoint.x, mLastMidPoint.y);
@@ -380,7 +396,8 @@ public class ScalableImageView extends AppCompatImageView {
             // 高小于控件，可以有间距，但是要移动到中心
             dy = getHeight() / 2 - mImageRect.centerY();
         }
-        mMatrix.postTranslate(dx, dy);
+        mTranslateAnimator = new TranslateAnimator(dx, dy);
+        mTranslateAnimator.start();
     }
 
 
@@ -388,19 +405,10 @@ public class ScalableImageView extends AppCompatImageView {
      * 检查图片缩放比例是否超过设置的大小
      */
     private void checkScale() {
-        PointF scaleCenter = mLastMidPoint;
-        // 缓存校正比例的变量
-        float scale = 1f;
-        // 根据情况计算校正比例
         if (mNowScale > MAX_SCALE) {
-            scale = MAX_SCALE / mNowScale;
-        } else if (mNowScale < mMinScale) {
-            scale = mMinScale / mNowScale;
+            mScaleAnimator = new ScaleAnimator(mNowScale, MAX_SCALE, mLastMidPoint);
+            mScaleAnimator.start();
         }
-        // 设置缩放
-        mMatrix.postScale(scale, scale, scaleCenter.x, scaleCenter.y);
-        // 重设当前比例
-        mNowScale *= scale;
     }
 
     /**
@@ -450,6 +458,14 @@ public class ScalableImageView extends AppCompatImageView {
             mFlingAnimator.cancel();
             mFlingAnimator = null;
         }
+        if (mScaleAnimator != null) {
+            mScaleAnimator.cancel();
+            mScaleAnimator = null;
+        }
+        if (mTranslateAnimator != null) {
+            mTranslateAnimator.cancel();
+            mTranslateAnimator = null;
+        }
     }
 
     /**
@@ -494,6 +510,83 @@ public class ScalableImageView extends AppCompatImageView {
             if (! result || Math.sqrt(velocityX * velocityX + velocityY * velocityY) < 1f) {
                 animation.cancel();
             }
+        }
+    }
+
+    /**
+     *  缩放动画，当图片缩放程度大于最大限度或小于最小限度，启动这个动画来复位
+     */
+    private class ScaleAnimator extends ValueAnimator
+            implements ValueAnimator.AnimatorUpdateListener {
+
+        /**
+         *  缩放操作的中心点
+         */
+        private PointF mScaleCenter;
+
+        public ScaleAnimator(float startScale, float endScale, PointF scaleCenter) {
+            setFloatValues(startScale, endScale);
+            addUpdateListener(this);
+            setDuration(300);
+            mScaleCenter = scaleCenter;
+        }
+        @Override
+        public void onAnimationUpdate(ValueAnimator animation) {
+            // 获取当前需要实际操作Matrix的倍率
+            float scale = (float) getAnimatedValue() / mNowScale;
+            mNowScale *= scale;
+            mMatrix.postScale(scale, scale, mScaleCenter.x, mScaleCenter.y);
+            commitMatrix();
+        }
+    }
+
+
+    private class TranslateAnimator extends ValueAnimator
+            implements ValueAnimator.AnimatorUpdateListener {
+
+        /**
+         *  缓存x轴已经移动过的距离
+         */
+        private float mNowXTranslate = 0f;
+
+        /**
+         *  缓存Y轴已经移动过的距离
+         */
+        private float mNowYTranslate = 0f;
+
+        /**
+         *  X轴需要移动的距离
+         */
+        private float mXTransDistance;
+
+        /**
+         *  Y轴需要移动的距离
+         */
+        private float mYTransDistance;
+
+        public TranslateAnimator(float xTransDistance, float yTransDistance) {
+            mXTransDistance = xTransDistance;
+            mYTransDistance = yTransDistance;
+
+            setFloatValues(0f, 1f);
+
+            setDuration(300);
+            addUpdateListener(this);
+        }
+
+        @Override
+        public void onAnimationUpdate(ValueAnimator animation) {
+            // 计算本次X轴需要移动的距离
+            float transXDistance = (float) getAnimatedValue() * mXTransDistance - mNowXTranslate;
+            // 计算本次Y轴需要移动的距离
+            float transYDistance = (float) getAnimatedValue() * mYTransDistance - mNowYTranslate;
+            // 更新X轴已经移动的距离
+            mNowXTranslate += transXDistance;
+            // 更新Y轴已经移动的距离
+            mNowYTranslate += transYDistance;
+            // 提交平移操作
+            mMatrix.postTranslate(transXDistance, transYDistance);
+            commitMatrix();
         }
     }
 }
