@@ -161,7 +161,9 @@ public class ScalableImageView extends AppCompatImageView {
                 // 只允许单手指拖动
                 if (mCanDrag) {
                     // 取消正在进行的滑动动画
-                    mFlingAnimator.cancel();
+                    if (mFlingAnimator != null) {
+                        mFlingAnimator.cancel();
+                    }
                     // 创建新的滑动动画
                     mFlingAnimator = new FlingAnimator(velocityX / 60,
                             velocityY / 60);
@@ -184,7 +186,6 @@ public class ScalableImageView extends AppCompatImageView {
             case MotionEvent.ACTION_POINTER_DOWN : {
                 // 计算本次触控事件的中点
                 calculateMidPointOfFinger(event);
-               // Log.d("this", event.getPointerCount() + "");
                 // 重置变量
                 mCanDrag = false;
                 mScalable = false;
