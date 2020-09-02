@@ -96,8 +96,14 @@ final class Utils {
                         && (runnableTwo instanceof Worker)) {
                     Worker workerOne = (Worker) runnableOne;
                     Worker workerTwo = (Worker) runnableTwo;
-                    // 由于队列按照升序排序，时间越大的反而应该在比较中返回负数
-                    return (int) (workerTwo.createTime - workerOne.createTime) / 1000;
+
+                    long timeInterval = workerOne.createTime - workerTwo.createTime;
+                    // 时间间隔过大
+                    if (timeInterval > Integer.MAX_VALUE) {
+                        return (int) (timeInterval / 1000);
+                    } else {
+                        return (int) timeInterval;
+                    }
                 } else {
                     return 0;
                 }

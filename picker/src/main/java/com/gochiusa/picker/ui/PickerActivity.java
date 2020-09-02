@@ -133,9 +133,9 @@ public class PickerActivity extends AppCompatActivity implements Observer {
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onStop() {
         clear();
-        super.onDestroy();
+        super.onStop();
     }
 
     /**

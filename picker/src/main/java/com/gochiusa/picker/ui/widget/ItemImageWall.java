@@ -7,6 +7,7 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.gochiusa.picker.R;
 import com.gochiusa.picker.entity.Image;
@@ -59,7 +60,8 @@ public class ItemImageWall extends SquareFrameLayout implements Observer, View.O
         mImage = image;
         // 调用图片引擎加载图片
         mImageRequest.getImageEngine().loadThumbnail(
-                mContext, 300, getContext().getDrawable(R.drawable.ic_white_background),
+                mContext, 300,
+                ContextCompat.getDrawable(getContext(), R.drawable.ic_white_background),
                 mImageView, image.getUri());
         registerObserverAgain();
     }
@@ -85,38 +87,38 @@ public class ItemImageWall extends SquareFrameLayout implements Observer, View.O
     }
 
     /**
-     *  继承Observer而重写的一个方法，实际上传入的参数并未使用
-     *  会尝试刷新{@link CheckView}上的选择状况
+     *  继承Observer而重写的一个方法
+     *@param arg 若为{@link SelectedItemCollection#REFRESH_INDEX}，
+     *           尝试刷新{@link CheckView}上的显示状态
+     *           若为{@link SelectedItemCollection#DETACH_THIS_OBSERVER}，则取消注册这个观察者
      */
     @Override
     public void update(@Nullable Observable o, @Nullable Object arg) {
+        if (arg == SelectedItemCollection.REFRESH_INDEX) {
+            updateWithIndex();
+        }
+        if (arg == SelectedItemCollection.DETACH_THIS_OBSERVER) {
+            detachThisObserver();
+        }
+    }
+
+    /**
+     *  从集合中获取图片的所有，然后判断并刷新{@link CheckView}的选中状态
+     */
+    private void updateWithIndex() {
         // 获取索引
         int index = mSelectedItemCollection.itemIndexOf(mImage);
-        // 如果索引和之前缓存的索引一致，结束方法，不再重新绘制
+        // 如果索引和之前缓存的索引一致，结束方法
         if (mImageIndex == index) {
             return;
         } else {
             // 否则更新索引
             mImageIndex = index;
         }
-        // 根据索引刷新控件状态
-        updateWithIndex(index);
-    }
-
-    /**
-     *  根据传入的索引，判断并刷新{@link CheckView}的选中状态
-     */
-    private void updateWithIndex(int index) {
+        // 如果索引无效
         if (index == -1) {
-            // 如果索引无效，清除这个观察者
-            mSelectedItemCollection.deleteObserver(this);
-            if (mImageRequest.countable) {
-                // 取消数字显示
-                setCheckNum(CheckView.UNSELECTED);
-            } else {
-                // 取消单选显示
-                setChecked(false);
-            }
+            // 清除这个观察者
+            detachThisObserver();
         } else {
             // 索引有效，根据是否可数而设置显示效果
             if (mImageRequest.countable) {
@@ -129,6 +131,21 @@ public class ItemImageWall extends SquareFrameLayout implements Observer, View.O
     }
 
     /**
+     *  取消这个观察者的注册，并复原{@link CheckView}为初始状态
+     */
+    private void detachThisObserver() {
+        // 清除这个观察者
+        mSelectedItemCollection.deleteObserver(this);
+        if (mImageRequest.countable) {
+            // 取消数字显示
+            setCheckNum(CheckView.UNSELECTED);
+        } else {
+            // 取消单选显示
+            setChecked(false);
+        }
+    }
+
+    /**
      *  检测该View是否从观察者队列中不正常移出
      *  若持有的image仍然存在于集合内，那么重新注册这个观察者
      *  最后刷新控件状态
@@ -136,16 +153,13 @@ public class ItemImageWall extends SquareFrameLayout implements Observer, View.O
     public void registerObserverAgain() {
         // 获取索引
         int index = mSelectedItemCollection.itemIndexOf(mImage);
-        // 判断集合内的参数是否有异常
-        boolean addToCollection =
-                (mSelectedItemCollection.getSize() - mSelectedItemCollection.countObservers() > -1);
-        // 如果索引有效，而且发现观察者被异常移除
-        if (index != -1 && addToCollection) {
+        // 如果索引有效，注册观察者
+        if (index != -1) {
             // 尝试添加观察者，因为Observable类已经拦截了相同的观察者，所以不会发生重复注册问题
             mSelectedItemCollection.addObserver(this);
         }
         // 刷新控件状态
-        update(null, null);
+        update(null, SelectedItemCollection.REFRESH_INDEX);
     }
 
 

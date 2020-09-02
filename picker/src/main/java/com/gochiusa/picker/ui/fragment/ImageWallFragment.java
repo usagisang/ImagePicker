@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.gochiusa.picker.R;
 import com.gochiusa.picker.adapter.ImageAdapter;
 import com.gochiusa.picker.entity.Image;
+import com.gochiusa.picker.model.SelectedItemCollection;
 import com.gochiusa.picker.ui.widget.ItemImageWall;
 import com.gochiusa.picker.ui.widget.WallDecoration;
 
@@ -31,7 +32,9 @@ public class ImageWallFragment extends Fragment {
     private List<Image> mImageList;
     private GridLayoutManager mGridLayoutManager;
 
-    public ImageWallFragment() {}
+    public ImageWallFragment() {
+        this(null);
+    }
 
     public ImageWallFragment(List<Image> list) {
         mImageList = list;
@@ -55,6 +58,13 @@ public class ImageWallFragment extends Fragment {
         mRecyclerView.addItemDecoration(new WallDecoration());
         // 初始化适配器
         mRecyclerView.setAdapter(new ImageAdapter(mImageList));
+    }
+
+    @Override
+    public void onDestroy() {
+        // 碎片销毁之前，请求清除这个碎片注册过的所有观察者
+        SelectedItemCollection.getInstance().detachObservers();
+        super.onDestroy();
     }
 
     /**

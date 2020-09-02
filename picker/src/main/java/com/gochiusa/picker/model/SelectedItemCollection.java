@@ -18,12 +18,18 @@ public class SelectedItemCollection extends Observable {
     private static SelectedItemCollection singleton;
 
     /**
+     *  发出通知时传达给观察者的参数
+     */
+    public static final Object DETACH_THIS_OBSERVER = new Object();
+    public static final Object REFRESH_INDEX = new Object();
+
+    /**
      * 将一个新的Image实体类添加到最后一位
      */
     public void addSelectedImage(Image image) {
         mImageList.add(image);
         // 通知更新
-        notifyAllObserver();
+        notifyAllObserver(REFRESH_INDEX);
     }
 
     public int getSize() {
@@ -41,7 +47,7 @@ public class SelectedItemCollection extends Observable {
     public void removeImage(Image image) {
         mImageList.remove(image);
         // 通知观察者，某一个选择项已经被移除
-        notifyAllObserver();
+        notifyAllObserver(REFRESH_INDEX);
     }
 
     /**
@@ -60,13 +66,20 @@ public class SelectedItemCollection extends Observable {
 
     public void removeAllImage() {
         mImageList.clear();
-        notifyAllObserver();
+        notifyAllObserver(REFRESH_INDEX);
+    }
+
+    /**
+     *  尝试让观察者们主动与这个类detach，脱离联系
+     */
+    public void detachObservers() {
+        notifyAllObserver(DETACH_THIS_OBSERVER);
     }
 
 
-    public void notifyAllObserver() {
+    private void notifyAllObserver(Object arg) {
         setChanged();
-        notifyObservers();
+        notifyObservers(arg);
     }
 
     /**
@@ -98,6 +111,8 @@ public class SelectedItemCollection extends Observable {
      *  清除全局单例
      */
     public static void clearCollection() {
+        singleton.deleteObservers();
+        singleton.mImageList.clear();
         singleton = null;
     }
 
