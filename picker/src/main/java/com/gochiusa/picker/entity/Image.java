@@ -46,10 +46,6 @@ public class Image {
         return uri;
     }
 
-    public void setId(long id) {
-        this.id = id;
-        createUri();
-    }
 
     public void setMimeType(String mimeType) {
         this.mimeType = mimeType;
@@ -79,5 +75,19 @@ public class Image {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        int result = uri.hashCode();
+        result = 31 * result + mimeType.hashCode();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            result = 31 * result + Long.hashCode(id);
+            result = 31 * result + Long.hashCode(size);
+        } else {
+            result = 31 * result + (int) id;
+            result = 31 * result + (int) size;
+        }
+        return result;
     }
 }

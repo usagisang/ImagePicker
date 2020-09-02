@@ -396,8 +396,10 @@ public class ScalableImageView extends AppCompatImageView {
             // 高小于控件，可以有间距，但是要移动到中心
             dy = getHeight() / 2 - mImageRect.centerY();
         }
-        mTranslateAnimator = new TranslateAnimator(dx, dy);
-        mTranslateAnimator.start();
+        if (dx != 0 || dy != 0) {
+            mTranslateAnimator = new TranslateAnimator(dx, dy);
+            mTranslateAnimator.start();
+        }
     }
 
 
