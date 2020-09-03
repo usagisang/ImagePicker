@@ -10,14 +10,19 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.gochiusa.picker.R;
+import com.gochiusa.picker.adapter.PreviewImageAdapter;
 import com.gochiusa.picker.adapter.PreviewPageAdapter;
 import com.gochiusa.picker.entity.Image;
 import com.gochiusa.picker.entity.ImageRequest;
 import com.gochiusa.picker.model.SelectedItemCollection;
 import com.gochiusa.picker.ui.widget.CheckView;
+import com.gochiusa.picker.ui.widget.PreviewDecoration;
 import com.gochiusa.picker.util.FragmentManageUtil;
 
 import java.util.Arrays;
@@ -36,6 +41,10 @@ public class PreviewFragment extends Fragment implements ViewPager.OnPageChangeL
     private List<Image> mImageList;
     private SelectedItemCollection mSelectedItemCollection;
 
+    private RecyclerView mPreviewRecyclerView;
+    private PreviewImageAdapter mPreviewImageAdapter;
+    private LinearLayoutManager mLinearLayoutManager;
+
     private ImageWallFragment mImageWallFragment;
     /**
      *  当前展示的图片的下标索引
@@ -48,10 +57,16 @@ public class PreviewFragment extends Fragment implements ViewPager.OnPageChangeL
 
     @Override
     public void onAttach(@NonNull Context context) {
+
         super.onAttach(context);
+        mSelectedItemCollection = SelectedItemCollection.getInstance();
         // 初始化适配器
         mPageAdapter = new PreviewPageAdapter(mImageList, context);
-        mSelectedItemCollection = SelectedItemCollection.getInstance();
+        mPreviewImageAdapter = new PreviewImageAdapter(
+                mSelectedItemCollection.getReadOnlyImageList(), context);
+        // 初始化布局管理器
+        mLinearLayoutManager = new LinearLayoutManager(context,
+                RecyclerView.HORIZONTAL, false);
     }
 
     @Nullable
@@ -66,6 +81,10 @@ public class PreviewFragment extends Fragment implements ViewPager.OnPageChangeL
     private void initChildView(View parent) {
         mViewPager = parent.findViewById(R.id.vp_fragment_preview);
         mSelectCheckView = parent.findViewById(R.id.check_view_preview_select);
+        mPreviewRecyclerView = parent.findViewById(R.id.rv_ui_preview);
+
+        initRecyclerView();
+
         // 为ViewPager添加适配器
         mViewPager.setAdapter(mPageAdapter);
         // 添加ViewPager切换页面时的监听器
@@ -78,6 +97,7 @@ public class PreviewFragment extends Fragment implements ViewPager.OnPageChangeL
         if (mFirstShowPosition == 0) {
             onPageSelected(mFirstShowPosition);
         }
+
     }
 
     /**
@@ -142,8 +162,21 @@ public class PreviewFragment extends Fragment implements ViewPager.OnPageChangeL
         return mImageWallFragment.getWallItemAt(position);
     }
 
+    private void initRecyclerView() {
+        // 设置布局管理器
+        mPreviewRecyclerView.setLayoutManager(mLinearLayoutManager);
+        // 添加自定义分割线
+        mPreviewRecyclerView.addItemDecoration(new PreviewDecoration());
+        // 添加适配器
+        mPreviewRecyclerView.setAdapter(mPreviewImageAdapter);
+        mSelectedItemCollection.addObserver(mPreviewImageAdapter);
+        new ItemTouchHelper(new PreviewImageAdapter.ItemDragCallback(mPreviewImageAdapter))
+                .attachToRecyclerView(mPreviewRecyclerView);
+    }
+
     private void initParentFragment() {
         mImageWallFragment = (ImageWallFragment) FragmentManageUtil.getFragmentManager()
                 .findFragmentByTag(ImageWallFragment.WALL_TAG);
     }
+
 }

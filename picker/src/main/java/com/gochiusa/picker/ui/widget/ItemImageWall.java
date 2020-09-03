@@ -88,7 +88,8 @@ public class ItemImageWall extends SquareFrameLayout implements Observer, View.O
 
     /**
      *  继承Observer而重写的一个方法
-     *@param arg 若为{@link SelectedItemCollection#REFRESH_INDEX}，
+     *@param arg 若为{@link SelectedItemCollection#REFRESH_INDEX}
+     *           或{@link SelectedItemCollection#SWAP_ITEMS}
      *           尝试刷新{@link CheckView}上的显示状态
      *           若为{@link SelectedItemCollection#DETACH_THIS_OBSERVER}，则取消注册这个观察者
      */
@@ -99,6 +100,9 @@ public class ItemImageWall extends SquareFrameLayout implements Observer, View.O
         }
         if (arg == SelectedItemCollection.DETACH_THIS_OBSERVER) {
             detachThisObserver();
+        }
+        if (arg == SelectedItemCollection.SWAP_ITEMS) {
+            updateWithIndex();
         }
     }
 

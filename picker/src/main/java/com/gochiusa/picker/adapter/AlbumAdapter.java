@@ -9,11 +9,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gochiusa.picker.R;
 import com.gochiusa.picker.entity.Album;
-import com.gochiusa.picker.entity.Image;
 import com.gochiusa.picker.entity.ImageRequest;
 
 import java.io.File;
@@ -58,7 +58,7 @@ public class AlbumAdapter extends ListAdapter<Album, AlbumAdapter.AlbumViewHolde
         Album album = getItem(position);
         // 调用图片加载引擎加载图片
         ImageRequest.getInstance().getImageEngine().loadThumbnail(mContext, 200,
-                mContext.getDrawable(R.drawable.ic_photo_album), holder.cover,
+                ContextCompat.getDrawable(mContext, R.drawable.ic_photo_album), holder.cover,
                 Uri.fromFile(new File(album.getCoverPath())));
         holder.albumText.setText(album.getDisplayName());
         holder.photoCount.setText(String.format(Locale.CHINA,
