@@ -5,4 +5,5 @@
     <color name="color_white">#ffffff</color>
     <color name="color_black">#000000</color>
     <color name="color_check_view_circle">#FBFAFA</color>
+    <color name="color_green">#66BB6A</color>
 </resources>

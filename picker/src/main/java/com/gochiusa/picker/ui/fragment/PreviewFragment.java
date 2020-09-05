@@ -49,7 +49,7 @@ public class PreviewFragment extends Fragment implements ViewPager.OnPageChangeL
     /**
      *  当前展示的图片的下标索引
      */
-    private int mNowShowPosition = 0;
+    private int mNowShowPosition = -1;
     /**
      *  打开这个界面需要显示的第一张图片的位置
      */
@@ -57,7 +57,6 @@ public class PreviewFragment extends Fragment implements ViewPager.OnPageChangeL
 
     @Override
     public void onAttach(@NonNull Context context) {
-
         super.onAttach(context);
         mSelectedItemCollection = SelectedItemCollection.getInstance();
         // 初始化适配器
@@ -97,7 +96,6 @@ public class PreviewFragment extends Fragment implements ViewPager.OnPageChangeL
         if (mFirstShowPosition == 0) {
             onPageSelected(mFirstShowPosition);
         }
-
     }
 
     /**
@@ -115,12 +113,17 @@ public class PreviewFragment extends Fragment implements ViewPager.OnPageChangeL
 
     @Override
     public void onPageSelected(int position) {
+        // 缓存上一次展示的图片在已选择集合的索引
+        int lastImageIndex = mNowShowPosition == -1 ? mNowShowPosition :
+                mSelectedItemCollection.itemIndexOf(mImageList.get(mNowShowPosition));
         // 更新当前显示的图片索引
         mNowShowPosition = position;
         // 查询已选的集合内是否有当前位置的图片的数据
-        int index = mSelectedItemCollection.itemIndexOf(mImageList.get(position));
+        int nowImageIndex = mSelectedItemCollection.itemIndexOf(mImageList.get(position));
         // 如果有，那么设置CheckView为已选状态，否则为未选状态
-        mSelectCheckView.setChecked(index > -1);
+        mSelectCheckView.setChecked(nowImageIndex > -1);
+        // 将当前的索引通知recyclerView的适配器
+        mPreviewImageAdapter.setNowImageIndex(nowImageIndex);
     }
 
     @Override
@@ -167,6 +170,9 @@ public class PreviewFragment extends Fragment implements ViewPager.OnPageChangeL
         mPreviewRecyclerView.setLayoutManager(mLinearLayoutManager);
         // 添加自定义分割线
         mPreviewRecyclerView.addItemDecoration(new PreviewDecoration());
+        // 设置子项的点击事件
+        mPreviewImageAdapter.setGlobalClickListener((image) ->
+                mViewPager.setCurrentItem(mImageList.indexOf(image), true));
         // 添加适配器
         mPreviewRecyclerView.setAdapter(mPreviewImageAdapter);
         mSelectedItemCollection.addObserver(mPreviewImageAdapter);
@@ -178,5 +184,4 @@ public class PreviewFragment extends Fragment implements ViewPager.OnPageChangeL
         mImageWallFragment = (ImageWallFragment) FragmentManageUtil.getFragmentManager()
                 .findFragmentByTag(ImageWallFragment.WALL_TAG);
     }
-
 }
