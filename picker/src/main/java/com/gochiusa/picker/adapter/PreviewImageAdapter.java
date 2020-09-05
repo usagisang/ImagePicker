@@ -86,12 +86,19 @@ public class PreviewImageAdapter extends ListAdapter<Image,
         mGlobalListener = listener;
     }
 
-    public void setNowImageIndex(int nowSelectedIndex) {
+    /**
+     *  设置当前在{@code ViewPager}上展示的图片的{@code Image}信息，在对应的已选择集合中的索引
+     *  并且刷新{@code RecyclerView}的显示。
+     *  如果传入一个有效的索引，那么对应位置上的子项将变成被标记样式
+     *  由于同时只能存在一个被选中的子项的缘故，因此上一个标记将被清除
+     * @param nowSelectedIndex 若传入-1，代表展示的图片不在已选择集合内
+     */
+    public void setNowImageIndexAndRefresh(int nowSelectedIndex) {
         int lastPosition = mNowSelectedPosition;
         this.mNowSelectedPosition = nowSelectedIndex;
-        // 刷新上一次被选中的项目
+        // 刷新上一次被标记的项目，取消标记
         notifyItemChanged(lastPosition);
-        // 刷新这次新选中的项目
+        // 刷新这次新选中的项目，加上标记
         notifyItemChanged(mNowSelectedPosition);
     }
 

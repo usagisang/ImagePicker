@@ -113,9 +113,6 @@ public class PreviewFragment extends Fragment implements ViewPager.OnPageChangeL
 
     @Override
     public void onPageSelected(int position) {
-        // 缓存上一次展示的图片在已选择集合的索引
-        int lastImageIndex = mNowShowPosition == -1 ? mNowShowPosition :
-                mSelectedItemCollection.itemIndexOf(mImageList.get(mNowShowPosition));
         // 更新当前显示的图片索引
         mNowShowPosition = position;
         // 查询已选的集合内是否有当前位置的图片的数据
@@ -123,7 +120,7 @@ public class PreviewFragment extends Fragment implements ViewPager.OnPageChangeL
         // 如果有，那么设置CheckView为已选状态，否则为未选状态
         mSelectCheckView.setChecked(nowImageIndex > -1);
         // 将当前的索引通知recyclerView的适配器
-        mPreviewImageAdapter.setNowImageIndex(nowImageIndex);
+        mPreviewImageAdapter.setNowImageIndexAndRefresh(nowImageIndex);
     }
 
     @Override
@@ -131,10 +128,15 @@ public class PreviewFragment extends Fragment implements ViewPager.OnPageChangeL
 
     @Override
     public void onClick(View v) {
-        // 如果已经选中，则取消选择，并从集合中移除图片
+        Image nowPositionImage = mImageList.get(mNowShowPosition);
+
         if (mSelectCheckView.isChecked()) {
+            // 如果已经选中，则取消选择
             mSelectCheckView.setChecked(false);
-            mSelectedItemCollection.removeImage(mImageList.get(mNowShowPosition));
+            // 更新下方的RecyclerView
+            mPreviewImageAdapter.setNowImageIndexAndRefresh(-1);
+            // 从集合中移除图片
+            mSelectedItemCollection.removeImage(nowPositionImage);
         } else {
             // 检查是否已经达到了最大可选数
             int maxCount = ImageRequest.getInstance().maxSelectable;
@@ -149,10 +151,13 @@ public class PreviewFragment extends Fragment implements ViewPager.OnPageChangeL
             // 尝试获取该位置上的观察者
             Observer observer = getObserverByPosition(mNowShowPosition);
             if (observer == null) {
-                mSelectedItemCollection.addSelectedImage(mImageList.get(mNowShowPosition));
+                mSelectedItemCollection.addSelectedImage(nowPositionImage);
             } else {
-                mSelectedItemCollection.addSelectedItem(mImageList.get(mNowShowPosition), observer);
+                mSelectedItemCollection.addSelectedItem(nowPositionImage, observer);
             }
+            // 更新下方的RecyclerView
+            mPreviewImageAdapter.setNowImageIndexAndRefresh(
+                    mSelectedItemCollection.itemIndexOf(nowPositionImage));
         }
     }
 
