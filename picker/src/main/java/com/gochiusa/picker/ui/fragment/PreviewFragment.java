@@ -176,8 +176,13 @@ public class PreviewFragment extends Fragment implements ViewPager.OnPageChangeL
         // 添加自定义分割线
         mPreviewRecyclerView.addItemDecoration(new PreviewDecoration());
         // 设置子项的点击事件
-        mPreviewImageAdapter.setGlobalClickListener((image) ->
-                mViewPager.setCurrentItem(mImageList.indexOf(image), true));
+        mPreviewImageAdapter.setGlobalClickListener((image) -> {
+            // 计算ViewPager应该跳转的位置
+            int currentIndex = mImageList.indexOf(image);
+            if (currentIndex > -1) {
+                mViewPager.setCurrentItem(currentIndex, true);
+            }
+        });
         // 添加适配器
         mPreviewRecyclerView.setAdapter(mPreviewImageAdapter);
         mSelectedItemCollection.addObserver(mPreviewImageAdapter);
